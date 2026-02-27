@@ -266,7 +266,7 @@ export function AdminGames() {
                           <DropdownMenuLabel>Actions</DropdownMenuLabel>
                           <DropdownMenuSeparator />
                           <DropdownMenuItem asChild>
-                            <Link to={`/admin/games/${game._id}`} className="flex items-center gap-2">
+                            <Link to={`/admin/games/${game._id}/control`} className="flex items-center gap-2">
                               <Eye className="h-4 w-4" />
                               View
                             </Link>

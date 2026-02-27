@@ -17,8 +17,6 @@ import {
   AlertTriangle,
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Progress } from '@/components/ui/progress';
@@ -61,8 +59,6 @@ export function AdminGameControl() {
   const [actionLoading, setActionLoading] = useState<string | null>(null);
   const [lastNumber, setLastNumber] = useState<number | null>(null);
   const [showEndDialog, setShowEndDialog] = useState(false);
-  const [showManualWinDialog, setShowManualWinDialog] = useState(false);
-  const [selectedRuleId, setSelectedRuleId] = useState<string | null>(null);
 
   // Load game data
   useEffect(() => {
@@ -196,33 +192,6 @@ export function AdminGameControl() {
     } catch (error) {
       console.error('Failed to call number:', error);
       toast.error('Failed to call number');
-    }
-  };
-
-  const handleManualWin = (ruleId: string) => {
-    setSelectedRuleId(ruleId);
-    setShowManualWinDialog(true);
-  };
-
-  const handleManualWinSubmit = async (ticketId: string) => {
-    if (!id || !selectedRuleId) return;
-
-    setActionLoading('manualWin');
-    try {
-      await gameService.manualClaim(id, selectedRuleId, ticketId);
-      toast.success('Winner declared manually!');
-      setShowManualWinDialog(false);
-
-      // Refresh game state
-      const response = await gameService.getGame(id);
-      if (response.success) {
-        setGame(response.data);
-      }
-    } catch (error) {
-      console.error('Failed to declare winner:', error);
-      toast.error('Failed to declare winner');
-    } finally {
-      setActionLoading(null);
     }
   };
 
@@ -554,7 +523,6 @@ export function AdminGameControl() {
               <RuleItem
                 key={rule.id}
                 rule={rule}
-                onManualWin={handleManualWin}
               />
             ))}
 
@@ -609,73 +577,14 @@ export function AdminGameControl() {
         </AlertDialogContent>
       </AlertDialog>
 
-      {/* Manual Winner Selection Dialog */}
-      <ManualWinnerDialog
-        open={showManualWinDialog}
-        onOpenChange={setShowManualWinDialog}
-        onSubmit={handleManualWinSubmit}
-        loading={actionLoading === 'manualWin'}
-      />
+
     </div>
   );
 }
 
-function ManualWinnerDialog({
-  open,
-  onOpenChange,
-  onSubmit,
-  loading
-}: {
-  open: boolean;
-  onOpenChange: (open: boolean) => void;
-  onSubmit: (ticketId: string) => void;
-  loading: boolean;
-}) {
-  const [ticketId, setTicketId] = useState('');
-
-  const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
-    if (!ticketId.trim()) return;
-    onSubmit(ticketId);
-    setTicketId('');
-  };
-
-  return (
-    <AlertDialog open={open} onOpenChange={onOpenChange}>
-      <AlertDialogContent>
-        <AlertDialogHeader>
-          <AlertDialogTitle>Manual Winner Selection</AlertDialogTitle>
-          <AlertDialogDescription>
-            Enter the Ticket ID that you want to declare as the winner for this rule.
-            This will override the automated checking.
-          </AlertDialogDescription>
-        </AlertDialogHeader>
-        <form onSubmit={handleSubmit} className="space-y-4 my-4">
-          <div className="space-y-2">
-            <Label htmlFor="ticketId">Ticket ID</Label>
-            <Input
-              id="ticketId"
-              placeholder="Enter Ticket ID (e.g. T-123456)"
-              value={ticketId}
-              onChange={(e) => setTicketId(e.target.value)}
-              required
-            />
-          </div>
-          <AlertDialogFooter>
-            <AlertDialogCancel type="button">Cancel</AlertDialogCancel>
-            <Button type="submit" disabled={loading || !ticketId.trim()}>
-              {loading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
-              Declare Winner
-            </Button>
-          </AlertDialogFooter>
-        </form>
-      </AlertDialogContent>
-    </AlertDialog>
-  );
-}
 
 // Rule item component
-function RuleItem({ rule, onManualWin }: { rule: GameRule; onManualWin: (ruleId: string) => void }) {
+function RuleItem({ rule }: { rule: GameRule }) {
   return (
     <div className={cn(
       'flex items-center justify-between p-3 rounded-lg border transition-colors',
@@ -703,24 +612,12 @@ function RuleItem({ rule, onManualWin }: { rule: GameRule; onManualWin: (ruleId:
           </p>
         </div>
       </div>
-      <div className="text-right flex items-center gap-3">
-        <div>
-          <p className="font-bold text-green-600">₹{rule.prizeAmount}</p>
-          {rule.isCompleted && rule.winner && (
-            <p className="text-xs text-muted-foreground">
-              Won by {rule.winner.userName}
-            </p>
-          )}
-        </div>
-        {!rule.isCompleted && (
-          <Button
-            variant="outline"
-            size="sm"
-            className="h-8 text-xs border-dashed"
-            onClick={() => onManualWin(rule.id)}
-          >
-            Manual Win
-          </Button>
+      <div className="text-right">
+        <p className="font-bold text-green-600">₹{rule.prizeAmount}</p>
+        {rule.isCompleted && rule.winner && (
+          <p className="text-xs text-muted-foreground">
+            Won by {rule.winner.userName}
+          </p>
         )}
       </div>
     </div>

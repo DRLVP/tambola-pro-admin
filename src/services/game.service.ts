@@ -96,12 +96,6 @@ export const gameService = {
     return response.data;
   },
 
-  // Manual claim winner (admin)
-  async manualClaim(id: string, ruleId: string, ticketId: string): Promise<ApiResponse<Game>> {
-    const response = await api.post(`/games/${id}/manual-claim`, { ruleId, ticketId });
-    return response.data;
-  },
-
   // Get dashboard stats (admin)
   async getDashboardStats(): Promise<ApiResponse<DashboardStats>> {
     const response = await api.get('/admin/dashboard/stats');

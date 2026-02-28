@@ -24,32 +24,33 @@ import {
   Line,
   Legend,
 } from 'recharts';
-import { statsService, type ReportStats } from '@/services/stats.service';
 import { formatCurrency } from '@/lib/utils';
 import { Skeleton } from '@/components/ui/skeleton';
 import { useAdminStatsStore } from '@/stores/admin-stats-store';
 
+// Local report types (no backend endpoint for detailed reports yet)
+interface ReportData {
+  revenueData: { month: string; revenue: number; games: number }[];
+  playerData: { month: string; newUsers: number; activeUsers: number }[];
+  prizeDistribution: { name: string; value: number; color: string }[];
+  topGames: { name: string; players: number; revenue: number }[];
+}
+
 export function AdminReports() {
   const [timeRange, setTimeRange] = useState('6months');
-  const [reportData, setReportData] = useState<ReportStats | null>(null);
-  const [loading, setLoading] = useState(true);
-  const { stats } = useAdminStatsStore(); // Use global stats for summary cards if available
+  const { stats, fetchStats, isLoading: loading } = useAdminStatsStore();
 
   useEffect(() => {
-    const fetchReports = async () => {
-      setLoading(true);
-      try {
-        const data = await statsService.getReports(timeRange);
-        setReportData(data);
-      } catch (error) {
-        console.error('Failed to fetch reports:', error);
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    fetchReports();
+    fetchStats();
   }, [timeRange]);
+
+  // Reports backend endpoint is not yet available — display dashboard stats
+  const reportData: ReportData = {
+    revenueData: [],
+    playerData: [],
+    prizeDistribution: [],
+    topGames: [],
+  };
 
   if (loading && !reportData) {
     return (

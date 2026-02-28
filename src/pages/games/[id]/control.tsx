@@ -34,7 +34,7 @@ import {
 import { AdminNumberPad } from '@/components/admin-number-pad';
 import { cn } from '@/lib/utils';
 import { gameService } from '@/services/game.service';
-import { useSocket } from '@/stores/socket-store';
+import { useSocketStore } from '@/stores/socket-store';
 import { areAllRulesCompleted, PATTERN_DEFINITIONS } from '@/lib/game-rules';
 import type { Game, GameRule } from '@/types';
 
@@ -52,7 +52,7 @@ const statusColors: Record<string, string> = {
 export function AdminGameControl() {
   const { id } = useParams();
   const navigate = useNavigate();
-  const socket = useSocket();
+  const { initializeSocket, joinGame, leaveGame, socket, isConnected } = useSocketStore();
   const [game, setGame] = useState<Game | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(false);
@@ -86,6 +86,20 @@ export function AdminGameControl() {
 
     loadGame();
   }, [id]);
+
+  // Initialize socket and join game room
+  useEffect(() => {
+    initializeSocket();
+  }, [initializeSocket]);
+
+  useEffect(() => {
+    if (isConnected && id) {
+      joinGame(id);
+      return () => {
+        leaveGame(id);
+      };
+    }
+  }, [isConnected, id, joinGame, leaveGame]);
 
   // Socket listeners
   useEffect(() => {
@@ -274,7 +288,7 @@ export function AdminGameControl() {
 
       // Redirect to results after delay
       setTimeout(() => {
-        navigate(`/game/${id}/results`);
+        navigate('/admin/games');
       }, 2000);
     } catch (error) {
       console.error('Failed to end game:', error);
@@ -440,7 +454,7 @@ export function AdminGameControl() {
 
             {/* View Results */}
             {game.status === 'completed' && (
-              <Link to={`/game/${id}/results`}>
+              <Link to="/admin/games">
                 <Button size="lg" className="gap-2">
                   <Trophy className="h-5 w-5" />
                   View Results

@@ -18,9 +18,9 @@ export const ticketService = {
     return response.data;
   },
 
-  // Get tickets for a specific game
-  async getGameTickets(gameId: string): Promise<ApiResponse<Ticket[]>> {
-    const response = await api.get(`/games/${gameId}/tickets`);
+  // Get tickets for a specific game (Admin)
+  async getGameTickets(gameId: string): Promise<PaginatedResponse<Ticket>> {
+    const response = await api.get(`/tickets/game/${gameId}`);
     return response.data;
   },
 
@@ -53,30 +53,23 @@ export const ticketService = {
     return response.data;
   },
 
-  // Admin: Generate tickets for game
-  async generateTickets(gameId: string, count: number): Promise<ApiResponse<Ticket[]>> {
-    const response = await api.post(`/admin/games/${gameId}/generate-tickets`, { count });
-    return response.data;
-  },
-
   // Admin: Get pending tickets
-  async getPendingTickets(gameId?: string): Promise<ApiResponse<Ticket[]>> {
-    const response = await api.get('/admin/tickets/pending', { params: { gameId } });
+  async getPendingTickets(gameId?: string): Promise<PaginatedResponse<Ticket>> {
+    const response = await api.get('/tickets/pending', { params: { gameId } });
     return response.data;
   },
 
-  // Admin: Confirm ticket (pending ? confirmed)
+  // Admin: Confirm ticket (pending → active)
   async confirmTicket(ticketId: string): Promise<ApiResponse<Ticket>> {
-    const response = await api.post(`/admin/tickets/${ticketId}/confirm`);
+    const response = await api.post(`/tickets/${ticketId}/confirm`);
     return response.data;
   },
 
-  // Admin: Cancel ticket (pending ? cancelled, release back to pool)
+  // Admin: Cancel ticket
   async cancelTicket(ticketId: string): Promise<ApiResponse<Ticket>> {
-    const response = await api.post(`/admin/tickets/${ticketId}/cancel`);
+    const response = await api.post(`/tickets/${ticketId}/cancel`);
     return response.data;
   },
-
 };
 
 export default ticketService;

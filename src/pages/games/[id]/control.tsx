@@ -121,22 +121,46 @@ export function AdminGameControl() {
       setLastNumber(newNumber);
     };
 
+    // Winner claimed — refresh full game data to sync rules & winners
+    const handleWinnerClaimed = async () => {
+      try {
+        const response = await gameService.getGame(id!);
+        if (response.success && response.data) {
+          setGame(response.data);
+          toast.success('🏆 A prize has been won!');
+        }
+      } catch (err) {
+        console.error('Failed to refresh game on winner:', err);
+      }
+    };
+
     const handleGameEnded = () => {
       setGame(prev => prev ? { ...prev, status: 'completed', endedAt: new Date().toISOString() } : null);
       toast.info('Game has been ended');
     };
 
-    socket.on('game:number-called', handleNumberCalled);
-    socket.on('game:ended', handleGameEnded);
+    const handleGamePaused = () => {
+      setGame(prev => prev ? { ...prev, status: 'paused' } : null);
+      toast.info('Game has been paused');
+    };
 
-    // Join the game room if needed, though typically handled by joining page or global join
-    // Assuming we might need to join a room specific to this game ID if backend requires it
-    // user didn't specify join logic, but standard socket practice suggests it
-    // skipping emit join for now as not requested, focusing on listeners
+    const handleGameResumed = () => {
+      setGame(prev => prev ? { ...prev, status: 'active' } : null);
+      toast.info('Game has been resumed');
+    };
+
+    socket.on('game:number-called', handleNumberCalled);
+    socket.on('game:winner-claimed', handleWinnerClaimed);
+    socket.on('game:ended', handleGameEnded);
+    socket.on('game:paused', handleGamePaused);
+    socket.on('game:resumed', handleGameResumed);
 
     return () => {
       socket.off('game:number-called', handleNumberCalled);
+      socket.off('game:winner-claimed', handleWinnerClaimed);
       socket.off('game:ended', handleGameEnded);
+      socket.off('game:paused', handleGamePaused);
+      socket.off('game:resumed', handleGameResumed);
     };
   }, [socket, id]);
 

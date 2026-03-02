@@ -14,8 +14,8 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { useAdminStatsStore } from '@/stores/admin-stats-store';
 
 import { formatCurrency } from '@/lib/utils';
-import type { Game } from '@/types';
 import { Skeleton } from '@/components/ui/skeleton';
+import { Badge } from '@/components/ui/badge';
 
 export function AdminDashboard() {
   const { stats, isLoading, error, fetchStats } = useAdminStatsStore();
@@ -76,60 +76,68 @@ export function AdminDashboard() {
 
       {/* Stats Grid */}
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
-        <Card>
-          <CardContent className="pt-6">
-            <div className="flex items-center gap-3">
-              <div className="h-10 w-10 rounded-lg bg-green-100 dark:bg-green-900/30 flex items-center justify-center">
-                <TrendingUp className="h-5 w-5 text-green-600" />
-              </div>
-              <div>
-                <div className="text-2xl font-bold">
-                  {formatCurrency(stats?.totalRevenue || 0)}
+        <Link to="/admin/reports" className="block w-full h-full">
+          <Card className="hover:border-primary/50 transition-colors cursor-pointer h-full">
+            <CardContent className="pt-6">
+              <div className="flex items-center gap-3">
+                <div className="h-10 w-10 rounded-lg bg-green-100 dark:bg-green-900/30 flex items-center justify-center shrink-0">
+                  <TrendingUp className="h-5 w-5 text-green-600" />
                 </div>
-                <p className="text-sm text-muted-foreground">Total Revenue</p>
+                <div>
+                  <div className="text-2xl font-bold">
+                    {formatCurrency(stats?.totalRevenue || 0)}
+                  </div>
+                  <p className="text-sm text-muted-foreground">Total Revenue</p>
+                </div>
               </div>
-            </div>
-          </CardContent>
-        </Card>
-        <Card>
-          <CardContent className="pt-6">
-            <div className="flex items-center gap-3">
-              <div className="h-10 w-10 rounded-lg bg-violet-100 dark:bg-violet-900/30 flex items-center justify-center">
-                <Gamepad2 className="h-5 w-5 text-violet-600" />
+            </CardContent>
+          </Card>
+        </Link>
+        <Link to="/admin/games" className="block w-full h-full">
+          <Card className="hover:border-primary/50 transition-colors cursor-pointer h-full">
+            <CardContent className="pt-6">
+              <div className="flex items-center gap-3">
+                <div className="h-10 w-10 rounded-lg bg-violet-100 dark:bg-violet-900/30 flex items-center justify-center shrink-0">
+                  <Gamepad2 className="h-5 w-5 text-violet-600" />
+                </div>
+                <div>
+                  <div className="text-2xl font-bold">{stats?.totalGames || 0}</div>
+                  <p className="text-sm text-muted-foreground">Total Games</p>
+                </div>
               </div>
-              <div>
-                <div className="text-2xl font-bold">{stats?.totalGames || 0}</div>
-                <p className="text-sm text-muted-foreground">Total Games</p>
+            </CardContent>
+          </Card>
+        </Link>
+        <Link to="/admin/users" className="block w-full h-full">
+          <Card className="hover:border-primary/50 transition-colors cursor-pointer h-full">
+            <CardContent className="pt-6">
+              <div className="flex items-center gap-3">
+                <div className="h-10 w-10 rounded-lg bg-blue-100 dark:bg-blue-900/30 flex items-center justify-center shrink-0">
+                  <Users className="h-5 w-5 text-blue-600" />
+                </div>
+                <div>
+                  <div className="text-2xl font-bold">{stats?.totalUsers || 0}</div>
+                  <p className="text-sm text-muted-foreground">Total Players</p>
+                </div>
               </div>
-            </div>
-          </CardContent>
-        </Card>
-        <Card>
-          <CardContent className="pt-6">
-            <div className="flex items-center gap-3">
-              <div className="h-10 w-10 rounded-lg bg-blue-100 dark:bg-blue-900/30 flex items-center justify-center">
-                <Users className="h-5 w-5 text-blue-600" />
+            </CardContent>
+          </Card>
+        </Link>
+        <Link to="/admin/games?status=active" className="block w-full h-full">
+          <Card className="hover:border-primary/50 transition-colors cursor-pointer h-full">
+            <CardContent className="pt-6">
+              <div className="flex items-center gap-3">
+                <div className="h-10 w-10 rounded-lg bg-red-100 dark:bg-red-900/30 flex items-center justify-center shrink-0">
+                  <Activity className="h-5 w-5 text-red-600" />
+                </div>
+                <div>
+                  <div className="text-2xl font-bold">{stats?.activeGames || 0}</div>
+                  <p className="text-sm text-muted-foreground">Active Games</p>
+                </div>
               </div>
-              <div>
-                <div className="text-2xl font-bold">{stats?.totalUsers || 0}</div>
-                <p className="text-sm text-muted-foreground">Total Players</p>
-              </div>
-            </div>
-          </CardContent>
-        </Card>
-        <Card>
-          <CardContent className="pt-6">
-            <div className="flex items-center gap-3">
-              <div className="h-10 w-10 rounded-lg bg-red-100 dark:bg-red-900/30 flex items-center justify-center">
-                <Activity className="h-5 w-5 text-red-600" />
-              </div>
-              <div>
-                <div className="text-2xl font-bold">{stats?.activeGames || 0}</div>
-                <p className="text-sm text-muted-foreground">Active Games</p>
-              </div>
-            </div>
-          </CardContent>
-        </Card>
+            </CardContent>
+          </Card>
+        </Link>
       </div>
 
       <div className="grid lg:grid-cols-7 gap-6">
@@ -153,26 +161,36 @@ export function AdminDashboard() {
               </div>
             ) : (
               <div className="space-y-4">
-                {stats.recentGames.map((game: Game) => (
-                  <div key={game._id} className="flex items-center justify-between p-4 border rounded-lg bg-card hover:bg-muted/50 transition-colors">
+                {stats.recentGames.map((game: any) => (
+                  <Link key={game._id} to={`/admin/games/${game._id}/control`} className="flex items-center justify-between p-4 border rounded-lg bg-card hover:bg-muted/50 transition-colors cursor-pointer">
                     <div className="flex items-center gap-4">
                       <div className="h-10 w-10 rounded-full bg-violet-100 dark:bg-violet-900/30 flex items-center justify-center font-bold text-violet-600">
                         {game.name.charAt(0)}
                       </div>
                       <div>
-                        <p className="font-medium">{game.name}</p>
+                        <div className="flex items-center gap-2">
+                          <p className="font-medium">{game.name}</p>
+                          {game.status === 'completed' && game.winners && game.winners.length > 0 && (
+                            <Badge variant="outline" className="text-[10px] bg-green-50 text-green-700 border-green-200">
+                              Winner: {game.winners[0].userName || 'Unknown'}
+                            </Badge>
+                          )}
+                        </div>
                         <p className="text-sm text-muted-foreground">
-                          {new Date(game.createdAt).toLocaleDateString()}
+                          {game.createdAt ? new Date(game.createdAt).toLocaleString(undefined, {
+                            dateStyle: 'medium',
+                            timeStyle: 'short'
+                          }) : '-'}
                         </p>
                       </div>
                     </div>
                     <div className="text-right">
                       <p className="font-medium">
-                        {game.currentPlayers}/{game.maxPlayers > 900000 ? '∞' : game.maxPlayers}
+                        {game.soldTickets || 0}/{game.settings?.maxTickets || game.maxPlayers}
                       </p>
-                      <p className="text-xs text-muted-foreground">Players</p>
+                      <p className="text-xs text-muted-foreground">Tickets Sold</p>
                     </div>
-                  </div>
+                  </Link>
                 ))}
               </div>
             )}

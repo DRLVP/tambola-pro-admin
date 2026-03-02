@@ -1,6 +1,6 @@
 import { useState, useEffect, useCallback } from 'react';
 import { toast } from 'sonner';
-import { Search, MoreHorizontal, UserX, Trash2, Eye, Mail, Loader2, RefreshCw } from 'lucide-react';
+import { Search, MoreHorizontal, UserX, Trash2, Loader2, RefreshCw } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Badge } from '@/components/ui/badge';
@@ -71,15 +71,12 @@ export function AdminUsers() {
     if (selectedUser) {
       try {
         setActionLoading(true);
-        const newStatus = selectedUser.status === 'banned' ? false : true;
-        // The API expects 'banned' boolean, based on typical toggle logic
-        // But userService.toggleUserBan(id, banned: boolean)
-        // If current status is banned, we want to UNBAN (banned=false)
+        const newStatus = selectedUser.isBanned ? false : true;
         await userService.toggleUserBan(selectedUser._id, newStatus);
 
         setUsers(users.map(u =>
           u._id === selectedUser._id
-            ? { ...u, status: newStatus ? 'banned' : 'active' } // Optimistic update or refetch
+            ? { ...u, isBanned: newStatus }
             : u
         ));
 
@@ -143,7 +140,7 @@ export function AdminUsers() {
         <Card>
           <CardContent className="pt-6">
             <div className="text-2xl font-bold">
-              {loading ? <Loader2 className="h-6 w-6 animate-spin" /> : users.filter(u => u.status === 'active').length}
+              {loading ? <Loader2 className="h-6 w-6 animate-spin" /> : users.filter(u => !u.isBanned).length}
             </div>
             <p className="text-sm text-muted-foreground">Active Users</p>
           </CardContent>
@@ -151,7 +148,7 @@ export function AdminUsers() {
         <Card>
           <CardContent className="pt-6">
             <div className="text-2xl font-bold">
-              {loading ? <Loader2 className="h-6 w-6 animate-spin" /> : users.filter(u => u.status === 'banned').length}
+              {loading ? <Loader2 className="h-6 w-6 animate-spin" /> : users.filter(u => u.isBanned).length}
             </div>
             <p className="text-sm text-muted-foreground">Banned Users</p>
           </CardContent>
@@ -159,7 +156,7 @@ export function AdminUsers() {
         <Card>
           <CardContent className="pt-6">
             <div className="text-2xl font-bold text-green-600">
-              {loading ? <Loader2 className="h-6 w-6 animate-spin" /> : `?${totalWinnings.toLocaleString()}`}
+              {loading ? <Loader2 className="h-6 w-6 animate-spin" /> : `₹${totalWinnings.toLocaleString()}`}
             </div>
             <p className="text-sm text-muted-foreground">Total Winnings</p>
           </CardContent>
@@ -227,14 +224,14 @@ export function AdminUsers() {
                     <TableCell>{user.gamesPlayed || 0}</TableCell>
                     <TableCell>{user.gamesWon || 0}</TableCell>
                     <TableCell className="font-medium text-green-600">
-                      ?{(user.totalWinnings || 0).toLocaleString()}
+                      ₹{(user.totalWinnings || 0).toLocaleString()}
                     </TableCell>
                     <TableCell>
-                      <Badge className={user.status === 'active'
+                      <Badge className={!user.isBanned
                         ? 'bg-green-100 text-green-700'
                         : 'bg-red-100 text-red-700'
                       }>
-                        {user.status || 'unknown'}
+                        {user.isBanned ? 'Banned' : 'Active'}
                       </Badge>
                     </TableCell>
                     <TableCell>
@@ -250,24 +247,15 @@ export function AdminUsers() {
                         <DropdownMenuContent align="end">
                           <DropdownMenuLabel>Actions</DropdownMenuLabel>
                           <DropdownMenuSeparator />
-                          <DropdownMenuItem>
-                            <Eye className="h-4 w-4 mr-2" />
-                            View Profile
-                          </DropdownMenuItem>
-                          <DropdownMenuItem>
-                            <Mail className="h-4 w-4 mr-2" />
-                            Send Email
-                          </DropdownMenuItem>
-                          <DropdownMenuSeparator />
                           <DropdownMenuItem
                             onClick={() => {
                               setSelectedUser(user);
                               setBanDialogOpen(true);
                             }}
-                            className={user.status === 'banned' ? 'text-green-600' : 'text-amber-600'}
+                            className={user.isBanned ? 'text-green-600' : 'text-amber-600'}
                           >
                             <UserX className="h-4 w-4 mr-2" />
-                            {user.status === 'banned' ? 'Unban User' : 'Ban User'}
+                            {user.isBanned ? 'Unban User' : 'Ban User'}
                           </DropdownMenuItem>
                           <DropdownMenuItem
                             onClick={() => {
@@ -301,10 +289,10 @@ export function AdminUsers() {
         <AlertDialogContent>
           <AlertDialogHeader>
             <AlertDialogTitle>
-              {selectedUser?.status === 'banned' ? 'Unban User?' : 'Ban User?'}
+              {selectedUser?.isBanned ? 'Unban User?' : 'Ban User?'}
             </AlertDialogTitle>
             <AlertDialogDescription>
-              {selectedUser?.status === 'banned'
+              {selectedUser?.isBanned
                 ? `Are you sure you want to unban ${selectedUser?.name}? They will be able to join games again.`
                 : `Are you sure you want to ban ${selectedUser?.name}? They won't be able to join any games.`
               }
@@ -314,7 +302,7 @@ export function AdminUsers() {
             <AlertDialogCancel disabled={actionLoading}>Cancel</AlertDialogCancel>
             <AlertDialogAction onClick={(e) => { e.preventDefault(); handleBanUser(); }} disabled={actionLoading}>
               {actionLoading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
-              {selectedUser?.status === 'banned' ? 'Unban' : 'Ban'}
+              {selectedUser?.isBanned ? 'Unban' : 'Ban'}
             </AlertDialogAction>
           </AlertDialogFooter>
         </AlertDialogContent>

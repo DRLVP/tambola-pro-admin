@@ -7,6 +7,7 @@ export interface Game {
   ticketPrice: number;
   maxPlayers: number;
   currentPlayers: number;
+  soldTickets?: number;
   status: 'waiting' | 'active' | 'paused' | 'completed' | 'cancelled';
   scheduledAt?: string;
   startedAt?: string;
@@ -119,6 +120,7 @@ export interface User {
   gamesPlayed: number;
   gamesWon: number;
   totalWinnings: number;
+  isBanned?: boolean;
   status?: 'active' | 'banned';
   role?: 'user' | 'admin' | 'super_admin';
   createdAt: string;

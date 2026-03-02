@@ -10,7 +10,7 @@ import {
   Trash2,
   Edit,
   Eye,
-  Users,
+  Ticket,
   Gamepad2,
   Loader2,
   RefreshCw,
@@ -57,7 +57,7 @@ import { format } from 'date-fns';
 import type { Game } from '@/types';
 import { gameService } from '@/services/game.service';
 
-const statusColors: Record<Game['status'], string> = {
+const statusColors: Record<string, string> = {
   waiting: 'bg-amber-100 text-amber-700 dark:bg-amber-900/30 dark:text-amber-300',
   active: 'bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-300',
   completed: 'bg-gray-100 text-gray-700 dark:bg-gray-800 dark:text-gray-300',
@@ -230,33 +230,44 @@ export function AdminGames() {
                   </TableRow>
                 </TableHeader>
                 <TableBody>
-                  {filteredGames.map((game) => (
-                    <TableRow key={game._id}>
+                  {filteredGames.map((game: any) => (
+                    <TableRow
+                      key={game._id}
+                      className="cursor-pointer hover:bg-muted/50 transition-colors group"
+                      onClick={() => window.location.href = `/admin/games/${game._id}/control`}
+                    >
                       <TableCell>
                         <div>
-                          <p className="font-medium">{game.name}</p>
+                          <p className="font-medium group-hover:text-violet-600 transition-colors">{game.name}</p>
                           <p className="text-sm text-muted-foreground">by {game.hostName || 'Admin'}</p>
                         </div>
                       </TableCell>
                       <TableCell>
-                        <Badge className={statusColors[game.status] || 'bg-gray-100 text-gray-700'}>
-                          {game.status === 'active' && (
-                            <span className="w-2 h-2 rounded-full bg-green-500 mr-1.5 animate-pulse" />
+                        <div className="flex items-center gap-2">
+                          <Badge className={statusColors[game.status] || 'bg-gray-100 text-gray-700'}>
+                            {game.status === 'active' && (
+                              <span className="w-2 h-2 rounded-full bg-green-500 mr-1.5 animate-pulse" />
+                            )}
+                            {game.status ? game.status.charAt(0).toUpperCase() + game.status.slice(1) : 'Unknown'}
+                          </Badge>
+                          {game.status === 'completed' && game.winners && game.winners.length > 0 && (
+                            <Badge variant="outline" className="bg-green-50 text-green-700 border-green-200 text-xs">
+                              Winner: {game.winners[0].userName || 'Unknown'}
+                            </Badge>
                           )}
-                          {game.status ? game.status.charAt(0).toUpperCase() + game.status.slice(1) : 'Unknown'}
-                        </Badge>
+                        </div>
                       </TableCell>
                       <TableCell>
                         <div className="flex items-center gap-1.5">
-                          <Users className="h-4 w-4 text-muted-foreground" />
-                          {game.currentPlayers || 0}/{game.maxPlayers}
+                          <Ticket className="h-4 w-4 text-muted-foreground" />
+                          {game.soldTickets || 0}/{game.settings?.maxTickets || game.maxPlayers}
                         </div>
                       </TableCell>
-                      <TableCell className="hidden md:table-cell">₹{game.ticketPrice}</TableCell>
+                      <TableCell className="hidden md:table-cell">{game.ticketPrice} XP</TableCell>
                       <TableCell className="hidden md:table-cell">
                         {game.createdAt ? format(new Date(game.createdAt), 'dd MMM yyyy') : '-'}
                       </TableCell>
-                      <TableCell className="text-right">
+                      <TableCell className="text-right" onClick={(e) => e.stopPropagation()}>
                         <DropdownMenu>
                           <DropdownMenuTrigger asChild>
                             <Button variant="ghost" size="icon">

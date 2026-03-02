@@ -6,7 +6,6 @@ import {
   CheckCircle,
   XCircle,
   Ticket,
-  Users,
   ChevronRight,
   Gamepad2,
   Filter,
@@ -21,7 +20,6 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Skeleton } from "@/components/ui/skeleton";
-import { format } from "date-fns";
 import { ticketService } from "@/services/ticket.service";
 import { gameService } from "@/services/game.service";
 import type { Game, Ticket as TicketType } from "@/types";
@@ -209,8 +207,8 @@ export function TicketsPage() {
                           {game.status}
                         </Badge>
                         <span className="text-xs text-muted-foreground flex items-center gap-1">
-                          <Users className="h-3 w-3" />
-                          {game.currentPlayers || 0}/{game.maxPlayers}
+                          <Ticket className="h-3 w-3" />
+                          {game.soldTickets || 0}/{game.settings?.maxTickets || game.maxPlayers}
                         </span>
                       </div>
                     </div>
@@ -329,7 +327,6 @@ export function TicketsPage() {
                             <TableHead className="w-[80px]">Ticket #</TableHead>
                             <TableHead>User</TableHead>
                             <TableHead>Status</TableHead>
-                            <TableHead className="hidden sm:table-cell">Purchased</TableHead>
                             <TableHead className="text-right">Actions</TableHead>
                           </TableRow>
                         </TableHeader>
@@ -362,11 +359,6 @@ export function TicketsPage() {
                                   </TableCell>
                                   <TableCell>
                                     <Badge className={statusCfg.color}>{statusCfg.label}</Badge>
-                                  </TableCell>
-                                  <TableCell className="hidden sm:table-cell text-sm text-muted-foreground">
-                                    {ticket.purchasedAt
-                                      ? format(new Date(ticket.purchasedAt), "dd MMM yyyy, HH:mm")
-                                      : "—"}
                                   </TableCell>
                                   <TableCell className="text-right">
                                     <div className="flex items-center justify-end gap-1 opacity-60 group-hover:opacity-100 transition-opacity">

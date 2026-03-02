@@ -174,7 +174,28 @@
   * {
     @apply border-border outline-ring/50;
   }
+
   body {
     @apply bg-background text-foreground;
   }
+}
+
+/* ── Global Interactive Element Styles ── */
+button,
+a,
+[role="button"],
+select,
+summary,
+[tabindex]:not([tabindex="-1"]),
+input[type="checkbox"],
+input[type="radio"],
+label[for] {
+  cursor: pointer;
+}
+
+/* Faster taps on mobile — removes 300ms touch delay */
+html {
+  touch-action: manipulation;
+  -webkit-tap-highlight-color: transparent;
+  scroll-behavior: smooth;
 }

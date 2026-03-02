@@ -66,8 +66,8 @@ export function AdminCreateGame() {
   const defaultSettings = getDefaultSettings();
   const [settings, setSettings] = useState<GameSettings>({
     minTickets: 5,
-    maxTickets: 999, // Internal default since UI option removed
-    maxTicketsPerUser: 100, // Internal default
+    maxTickets: 50,
+    maxTicketsPerUser: 6,
     autoPlay: defaultSettings.autoPlay,
     autoPlayInterval: defaultSettings.autoPlayInterval,
   });
@@ -175,8 +175,23 @@ export function AdminCreateGame() {
       return false;
     }
 
+    if (settings.maxTickets < 5 || settings.maxTickets > 500) {
+      toast.error('Total tickets must be between 5 and 500');
+      return false;
+    }
+
     if (settings.minTickets < 5) {
       toast.error('Minimum tickets must be at least 5');
+      return false;
+    }
+
+    if (settings.minTickets > settings.maxTickets) {
+      toast.error('Minimum tickets cannot exceed total tickets');
+      return false;
+    }
+
+    if (settings.maxTicketsPerUser < 1 || settings.maxTicketsPerUser > settings.maxTickets) {
+      toast.error(`Max tickets per user must be between 1 and ${settings.maxTickets}`);
       return false;
     }
 
@@ -212,7 +227,7 @@ export function AdminCreateGame() {
         name: formData.name.trim(),
         description: formData.description.trim() || undefined,
         ticketPrice: parseInt(formData.ticketPrice),
-        maxPlayers: 1000000,
+        maxPlayers: settings.maxTickets,
         rules: rules.map(r => ({
           pattern: r.pattern as PrizePattern,
           name: r.name,
@@ -312,13 +327,37 @@ export function AdminCreateGame() {
             <CardDescription>Configure ticket limits and distribution</CardDescription>
           </CardHeader>
           <CardContent className="space-y-6">
-            <div className="grid grid-cols-1 gap-4">
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
               <div className="space-y-2">
-                <Label htmlFor="minTickets">Minimum Tickets (Min: 5) *</Label>
+                <Label htmlFor="maxTickets">Total Tickets *</Label>
+                <Input
+                  id="maxTickets"
+                  type="number"
+                  min="5"
+                  max="500"
+                  placeholder="50"
+                  value={settings.maxTickets}
+                  onChange={(e) => {
+                    const val = parseInt(e.target.value) || 5;
+                    setSettings({
+                      ...settings,
+                      maxTickets: val,
+                      // Auto-clamp per-user limit if it exceeds new total
+                      maxTicketsPerUser: Math.min(settings.maxTicketsPerUser, val),
+                    });
+                  }}
+                  required
+                />
+                <p className="text-xs text-muted-foreground">Total number of tickets to generate (5–500)</p>
+              </div>
+
+              <div className="space-y-2">
+                <Label htmlFor="minTickets">Minimum to Start *</Label>
                 <Input
                   id="minTickets"
                   type="number"
                   min="5"
+                  max={settings.maxTickets}
                   value={settings.minTickets}
                   onChange={(e) => setSettings({
                     ...settings,
@@ -326,7 +365,23 @@ export function AdminCreateGame() {
                   })}
                   required
                 />
-                <p className="text-xs text-muted-foreground">Minimum number of tickets required to start game</p>
+                <p className="text-xs text-muted-foreground">Min tickets sold before game can start</p>
+              </div>
+
+              <div className="space-y-2">
+                <Label htmlFor="maxTicketsPerUser">Max Per User</Label>
+                <Input
+                  id="maxTicketsPerUser"
+                  type="number"
+                  min="1"
+                  max={settings.maxTickets}
+                  value={settings.maxTicketsPerUser}
+                  onChange={(e) => setSettings({
+                    ...settings,
+                    maxTicketsPerUser: Math.max(1, Math.min(settings.maxTickets, parseInt(e.target.value) || 1))
+                  })}
+                />
+                <p className="text-xs text-muted-foreground">Max tickets one user can buy</p>
               </div>
             </div>
 

@@ -360,15 +360,15 @@ export function AdminGameControl() {
   return (
     <div className="space-y-6">
       {/* Header */}
-      <div className="flex items-center gap-4">
+      <div className="flex items-start gap-3 sm:gap-4">
         <Link to="/admin/games">
-          <Button variant="ghost" size="icon">
+          <Button variant="ghost" size="icon" className="flex-shrink-0 mt-1">
             <ArrowLeft className="h-5 w-5" />
           </Button>
         </Link>
-        <div className="flex-1">
-          <div className="flex items-center gap-3">
-            <h1 className="text-2xl font-bold">{game.name}</h1>
+        <div className="flex-1 min-w-0">
+          <div className="flex flex-wrap items-center gap-2">
+            <h1 className="text-xl sm:text-2xl font-bold truncate">{game.name}</h1>
             <Badge className={statusColors[game.status]}>
               {game.status === 'active' && (
                 <span className="w-2 h-2 rounded-full bg-green-500 mr-1.5 animate-pulse" />
@@ -376,7 +376,7 @@ export function AdminGameControl() {
               {game.status.charAt(0).toUpperCase() + game.status.slice(1)}
             </Badge>
           </div>
-          <p className="text-muted-foreground">Game Control Panel</p>
+          <p className="text-muted-foreground text-sm">Game Control Panel</p>
         </div>
       </div>
 

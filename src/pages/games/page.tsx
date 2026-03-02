@@ -217,128 +217,130 @@ export function AdminGames() {
               <Loader2 className="h-8 w-8 animate-spin text-muted-foreground" />
             </div>
           ) : (
-            <Table>
-              <TableHeader>
-                <TableRow>
-                  <TableHead>Game</TableHead>
-                  <TableHead>Status</TableHead>
-                  <TableHead>Players</TableHead>
-                  <TableHead>Ticket Price</TableHead>
-                  <TableHead>Created</TableHead>
-                  <TableHead className="text-right">Actions</TableHead>
-                </TableRow>
-              </TableHeader>
-              <TableBody>
-                {filteredGames.map((game) => (
-                  <TableRow key={game._id}>
-                    <TableCell>
-                      <div>
-                        <p className="font-medium">{game.name}</p>
-                        <p className="text-sm text-muted-foreground">by {game.hostName || 'Admin'}</p>
-                      </div>
-                    </TableCell>
-                    <TableCell>
-                      <Badge className={statusColors[game.status] || 'bg-gray-100 text-gray-700'}>
-                        {game.status === 'active' && (
-                          <span className="w-2 h-2 rounded-full bg-green-500 mr-1.5 animate-pulse" />
-                        )}
-                        {game.status ? game.status.charAt(0).toUpperCase() + game.status.slice(1) : 'Unknown'}
-                      </Badge>
-                    </TableCell>
-                    <TableCell>
-                      <div className="flex items-center gap-1.5">
-                        <Users className="h-4 w-4 text-muted-foreground" />
-                        {game.currentPlayers || 0}/{game.maxPlayers}
-                      </div>
-                    </TableCell>
-                    <TableCell>?{game.ticketPrice}</TableCell>
-                    <TableCell>
-                      {game.createdAt ? format(new Date(game.createdAt), 'dd MMM yyyy') : '-'}
-                    </TableCell>
-                    <TableCell className="text-right">
-                      <DropdownMenu>
-                        <DropdownMenuTrigger asChild>
-                          <Button variant="ghost" size="icon">
-                            <MoreHorizontal className="h-4 w-4" />
-                          </Button>
-                        </DropdownMenuTrigger>
-                        <DropdownMenuContent align="end">
-                          <DropdownMenuLabel>Actions</DropdownMenuLabel>
-                          <DropdownMenuSeparator />
-                          <DropdownMenuItem asChild>
-                            <Link to={`/admin/games/${game._id}/control`} className="flex items-center gap-2">
-                              <Eye className="h-4 w-4" />
-                              View
-                            </Link>
-                          </DropdownMenuItem>
-                          {game.status === 'waiting' && (
-                            <>
-                              <DropdownMenuItem asChild>
-                                <Link to={`/admin/games/${game._id}/edit`} className="flex items-center gap-2">
-                                  <Edit className="h-4 w-4" />
-                                  Edit
-                                </Link>
-                              </DropdownMenuItem>
-                              <DropdownMenuItem onClick={() => handleStartGame(game)} className="text-green-600">
-                                <Play className="h-4 w-4 mr-2" />
-                                Start Game
-                              </DropdownMenuItem>
-                            </>
-                          )}
-                          {game.status === 'active' && (
-                            <>
-                              <DropdownMenuItem asChild>
-                                <Link to={`/admin/games/${game._id}/control`} className="flex items-center gap-2 text-violet-600">
-                                  <Gamepad2 className="h-4 w-4" />
-                                  Game Control
-                                </Link>
-                              </DropdownMenuItem>
-                              <DropdownMenuItem onClick={() => handlePauseGame(game)} className="text-amber-600">
-                                <Pause className="h-4 w-4 mr-2" />
-                                Pause Game
-                              </DropdownMenuItem>
-                              <DropdownMenuItem onClick={() => handleEndGame(game)} className="text-red-600">
-                                <Square className="h-4 w-4 mr-2" />
-                                End Game
-                              </DropdownMenuItem>
-                            </>
-                          )}
-                          {game.status === 'paused' && (
-                            <>
-                              <DropdownMenuItem asChild>
-                                <Link to={`/admin/games/${game._id}/control`} className="flex items-center gap-2 text-violet-600">
-                                  <Gamepad2 className="h-4 w-4" />
-                                  Game Control
-                                </Link>
-                              </DropdownMenuItem>
-                              <DropdownMenuItem onClick={() => handleStartGame(game)} className="text-green-600">
-                                <Play className="h-4 w-4 mr-2" />
-                                Resume Game
-                              </DropdownMenuItem>
-                              <DropdownMenuItem onClick={() => handleEndGame(game)} className="text-red-600">
-                                <Square className="h-4 w-4 mr-2" />
-                                End Game
-                              </DropdownMenuItem>
-                            </>
-                          )}
-                          <DropdownMenuSeparator />
-                          <DropdownMenuItem
-                            onClick={() => {
-                              setSelectedGame(game);
-                              setDeleteDialogOpen(true);
-                            }}
-                            className="text-red-600"
-                          >
-                            <Trash2 className="h-4 w-4 mr-2" />
-                            Delete
-                          </DropdownMenuItem>
-                        </DropdownMenuContent>
-                      </DropdownMenu>
-                    </TableCell>
+            <div className="overflow-x-auto -mx-2 px-2">
+              <Table className="min-w-[600px]">
+                <TableHeader>
+                  <TableRow>
+                    <TableHead>Game</TableHead>
+                    <TableHead>Status</TableHead>
+                    <TableHead>Players</TableHead>
+                    <TableHead className="hidden md:table-cell">Ticket Price</TableHead>
+                    <TableHead className="hidden md:table-cell">Created</TableHead>
+                    <TableHead className="text-right">Actions</TableHead>
                   </TableRow>
-                ))}
-              </TableBody>
-            </Table>
+                </TableHeader>
+                <TableBody>
+                  {filteredGames.map((game) => (
+                    <TableRow key={game._id}>
+                      <TableCell>
+                        <div>
+                          <p className="font-medium">{game.name}</p>
+                          <p className="text-sm text-muted-foreground">by {game.hostName || 'Admin'}</p>
+                        </div>
+                      </TableCell>
+                      <TableCell>
+                        <Badge className={statusColors[game.status] || 'bg-gray-100 text-gray-700'}>
+                          {game.status === 'active' && (
+                            <span className="w-2 h-2 rounded-full bg-green-500 mr-1.5 animate-pulse" />
+                          )}
+                          {game.status ? game.status.charAt(0).toUpperCase() + game.status.slice(1) : 'Unknown'}
+                        </Badge>
+                      </TableCell>
+                      <TableCell>
+                        <div className="flex items-center gap-1.5">
+                          <Users className="h-4 w-4 text-muted-foreground" />
+                          {game.currentPlayers || 0}/{game.maxPlayers}
+                        </div>
+                      </TableCell>
+                      <TableCell className="hidden md:table-cell">₹{game.ticketPrice}</TableCell>
+                      <TableCell className="hidden md:table-cell">
+                        {game.createdAt ? format(new Date(game.createdAt), 'dd MMM yyyy') : '-'}
+                      </TableCell>
+                      <TableCell className="text-right">
+                        <DropdownMenu>
+                          <DropdownMenuTrigger asChild>
+                            <Button variant="ghost" size="icon">
+                              <MoreHorizontal className="h-4 w-4" />
+                            </Button>
+                          </DropdownMenuTrigger>
+                          <DropdownMenuContent align="end">
+                            <DropdownMenuLabel>Actions</DropdownMenuLabel>
+                            <DropdownMenuSeparator />
+                            <DropdownMenuItem asChild>
+                              <Link to={`/admin/games/${game._id}/control`} className="flex items-center gap-2">
+                                <Eye className="h-4 w-4" />
+                                View
+                              </Link>
+                            </DropdownMenuItem>
+                            {game.status === 'waiting' && (
+                              <>
+                                <DropdownMenuItem asChild>
+                                  <Link to={`/admin/games/${game._id}/edit`} className="flex items-center gap-2">
+                                    <Edit className="h-4 w-4" />
+                                    Edit
+                                  </Link>
+                                </DropdownMenuItem>
+                                <DropdownMenuItem onClick={() => handleStartGame(game)} className="text-green-600">
+                                  <Play className="h-4 w-4 mr-2" />
+                                  Start Game
+                                </DropdownMenuItem>
+                              </>
+                            )}
+                            {game.status === 'active' && (
+                              <>
+                                <DropdownMenuItem asChild>
+                                  <Link to={`/admin/games/${game._id}/control`} className="flex items-center gap-2 text-violet-600">
+                                    <Gamepad2 className="h-4 w-4" />
+                                    Game Control
+                                  </Link>
+                                </DropdownMenuItem>
+                                <DropdownMenuItem onClick={() => handlePauseGame(game)} className="text-amber-600">
+                                  <Pause className="h-4 w-4 mr-2" />
+                                  Pause Game
+                                </DropdownMenuItem>
+                                <DropdownMenuItem onClick={() => handleEndGame(game)} className="text-red-600">
+                                  <Square className="h-4 w-4 mr-2" />
+                                  End Game
+                                </DropdownMenuItem>
+                              </>
+                            )}
+                            {game.status === 'paused' && (
+                              <>
+                                <DropdownMenuItem asChild>
+                                  <Link to={`/admin/games/${game._id}/control`} className="flex items-center gap-2 text-violet-600">
+                                    <Gamepad2 className="h-4 w-4" />
+                                    Game Control
+                                  </Link>
+                                </DropdownMenuItem>
+                                <DropdownMenuItem onClick={() => handleStartGame(game)} className="text-green-600">
+                                  <Play className="h-4 w-4 mr-2" />
+                                  Resume Game
+                                </DropdownMenuItem>
+                                <DropdownMenuItem onClick={() => handleEndGame(game)} className="text-red-600">
+                                  <Square className="h-4 w-4 mr-2" />
+                                  End Game
+                                </DropdownMenuItem>
+                              </>
+                            )}
+                            <DropdownMenuSeparator />
+                            <DropdownMenuItem
+                              onClick={() => {
+                                setSelectedGame(game);
+                                setDeleteDialogOpen(true);
+                              }}
+                              className="text-red-600"
+                            >
+                              <Trash2 className="h-4 w-4 mr-2" />
+                              Delete
+                            </DropdownMenuItem>
+                          </DropdownMenuContent>
+                        </DropdownMenu>
+                      </TableCell>
+                    </TableRow>
+                  ))}
+                </TableBody>
+              </Table>
+            </div>
           )}
 
           {!loading && filteredGames.length === 0 && (

@@ -80,7 +80,7 @@ export interface GameWinner {
 }
 
 // Ticket Types
-export type TicketStatus = 'pending' | 'confirmed' | 'cancelled' | 'active' | 'won' | 'lost';
+export type TicketStatus = 'available' | 'pending' | 'confirmed' | 'cancelled' | 'active' | 'won' | 'lost';
 
 export interface TicketWinnerInfo {
   position: number; // 1st, 2nd, 3rd
@@ -93,10 +93,11 @@ export interface TicketWinnerInfo {
 
 export interface Ticket {
   _id: string;
+  ticketNumber?: number;
   gameId: string;
   gameName?: string;
-  userId: string;
-  userName: string;
+  userId?: string;
+  userName?: string;
   userEmail?: string;
   numbers: number[][]; // 3 rows x 9 columns (with 0s for empty cells)
   markedNumbers: number[];

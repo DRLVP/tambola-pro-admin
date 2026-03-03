@@ -124,7 +124,7 @@ export function AdminEditGame() {
 
             <div className="grid grid-cols-2 gap-4">
               <div className="space-y-2">
-                <Label htmlFor="ticketPrice">Ticket Price (₹) *</Label>
+                <Label htmlFor="ticketPrice">Ticket Price (XP) *</Label>
                 <Input
                   id="ticketPrice"
                   type="number"
@@ -193,7 +193,7 @@ export function AdminEditGame() {
                   </Select>
                 </div>
                 <div className="flex-1 space-y-2">
-                  <Label>Amount (₹)</Label>
+                  <Label>Amount (XP)</Label>
                   <Input
                     type="number"
                     value={prize.amount}
@@ -217,7 +217,7 @@ export function AdminEditGame() {
 
             <div className="flex justify-between items-center p-4 rounded-lg bg-muted">
               <span className="font-medium">Total Prize Pool</span>
-              <span className="text-lg font-bold text-green-600">₹{totalPrize.toLocaleString()}</span>
+              <span className="text-lg font-bold text-green-600">{totalPrize.toLocaleString()} XP</span>
             </div>
           </CardContent>
         </Card>

@@ -185,7 +185,7 @@ export function AdminReports() {
                     borderRadius: '8px',
                   }}
                   formatter={(value) => [
-                    typeof value === 'number' ? `₹${value.toLocaleString()}` : value,
+                    typeof value === 'number' ? `${value.toLocaleString()} XP` : value,
                     'Value'
                   ]}
                 />

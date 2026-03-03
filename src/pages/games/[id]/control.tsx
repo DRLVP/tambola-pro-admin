@@ -569,7 +569,7 @@ export function AdminGameControl() {
             <div className="flex justify-between items-center p-3 rounded-lg bg-green-50 dark:bg-green-950/30">
               <span className="font-medium">Total Prize Pool</span>
               <span className="text-xl font-bold text-green-600">
-                ₹{totalPrize.toLocaleString()}
+                {totalPrize.toLocaleString()} XP
               </span>
             </div>
           </CardContent>
@@ -651,7 +651,7 @@ function RuleItem({ rule }: { rule: GameRule }) {
         </div>
       </div>
       <div className="text-right">
-        <p className="font-bold text-green-600">₹{rule.prizeAmount}</p>
+        <p className="font-bold text-green-600">{rule.prizeAmount} XP</p>
         {rule.isCompleted && rule.winner && (
           <p className="text-xs text-muted-foreground">
             Won by {rule.winner.userName}

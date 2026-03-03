@@ -244,7 +244,7 @@ export function TicketsPage() {
                         {selectedGame?.name}
                       </h2>
                       <p className="text-sm text-muted-foreground mt-0.5">
-                        ₹{selectedGame?.ticketPrice} per ticket • {selectedGame?.status}
+                        {selectedGame?.ticketPrice} XP per ticket • {selectedGame?.status}
                       </p>
                     </div>
                     <div className="flex items-center gap-2">

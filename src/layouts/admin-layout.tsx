@@ -155,7 +155,7 @@ export function AdminLayout() {
   );
 
   return (
-    <div className="min-h-screen flex bg-muted/30">
+    <div className="min-h-[100dvh] flex bg-muted/30">
       {/* Desktop Sidebar */}
       <aside
         className={cn(
@@ -175,7 +175,7 @@ export function AdminLayout() {
       </aside>
 
       {/* Main Content */}
-      <div className="flex-1 flex flex-col min-h-screen">
+      <div className="flex-1 flex flex-col min-h-[100dvh] w-full overflow-x-hidden">
         {/* Top Header */}
         <header className="h-16 border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60 flex items-center justify-between px-4 lg:px-6 sticky top-0 z-40">
           {/* Mobile Menu */}
@@ -239,7 +239,7 @@ export function AdminLayout() {
         </header>
 
         {/* Page Content */}
-        <main className="flex-1 p-4 lg:p-6">
+        <main className="flex-1 p-4 lg:p-6 pb-24 md:pb-6">
           <Outlet />
         </main>
       </div>

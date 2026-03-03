@@ -156,7 +156,7 @@ export function AdminUsers() {
         <Card>
           <CardContent className="pt-6">
             <div className="text-2xl font-bold text-green-600">
-              {loading ? <Loader2 className="h-6 w-6 animate-spin" /> : `₹${totalWinnings.toLocaleString()}`}
+              {loading ? <Loader2 className="h-6 w-6 animate-spin" /> : `${totalWinnings.toLocaleString()} XP`}
             </div>
             <p className="text-sm text-muted-foreground">Total Winnings</p>
           </CardContent>
@@ -224,7 +224,7 @@ export function AdminUsers() {
                     <TableCell>{user.gamesPlayed || 0}</TableCell>
                     <TableCell>{user.gamesWon || 0}</TableCell>
                     <TableCell className="font-medium text-green-600">
-                      ₹{(user.totalWinnings || 0).toLocaleString()}
+                      {(user.totalWinnings || 0).toLocaleString()} XP
                     </TableCell>
                     <TableCell>
                       <Badge className={!user.isBanned
